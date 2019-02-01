@@ -1,0 +1,33 @@
+﻿<Window x:Class="REWWERSE.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:REWWERSE"
+        mc:Ignorable="d"
+        Title="Representin that 2018-03-11T09:46 friggin UTC!" Height="176" Width="525" Icon="REWERSE.ico" WindowStyle="ToolWindow">
+    <Grid>
+        <local:Player Margin="5" VerticalAlignment="Bottom" x:Name="Playa"/>
+        <Grid Height="22" Margin="5,7" VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="50" />
+            </Grid.ColumnDefinitions>
+            <Label Content="Artist:" HorizontalAlignment="Left" Grid.Column="0" Padding="3"/>
+            <TextBox x:Name="Artist" TextWrapping="Wrap" FontWeight="Bold" Grid.Column="0" Margin="42,0,5,0"/>
+            <Label Content="Album:" HorizontalAlignment="Left" Grid.Column="1" Padding="3"/>
+            <TextBox x:Name="Album" TextWrapping="Wrap" FontWeight="Bold" Grid.Column="1" Margin="48.4,0,5.2,0"/>
+            <Button Content="GO" Grid.Column="2" Margin="3,0" FontWeight="Bold" FontStyle="Italic" Click="Button_Click"/>
+        </Grid>
+        <Grid Height="22" Margin="5,34,5,0" VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="50" />
+            </Grid.ColumnDefinitions>
+            <Label Content="Path/URL:" HorizontalAlignment="Left" Grid.Column="0" Padding="3"/>
+            <TextBox x:Name="Path" Grid.Column="0" Margin="63,0,0.8,0" Grid.ColumnSpan="3" FontFamily="Consolas"/>
+        </Grid>
+    </Grid>
+</Window>

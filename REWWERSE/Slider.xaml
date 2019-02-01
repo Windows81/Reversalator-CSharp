@@ -1,0 +1,45 @@
+﻿<UserControl x:Class="REWWERSE.TrackSeeker"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:REWWERSE"
+			 xmlns:sys="clr-namespace:System;assembly=mscorlib"
+			 mc:Ignorable="d" 
+             d:DesignHeight="20" d:DesignWidth="127">
+	<UserControl.Resources>
+		<Color x:Key="Colour"></Color>
+		<sys:String x:Key="Time1">00</sys:String>
+		<sys:String x:Key="Time2">00</sys:String>
+		<Style TargetType="Label" x:Key="SeekTime">
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="Foreground" Value="Black"/>
+			<Setter Property="Padding" Value="5,0"/>
+			<Setter Property="VerticalContentAlignment" Value="Center"/>
+		</Style>
+	</UserControl.Resources>
+	<Grid>
+		<Rectangle Fill="#ccc"/>
+		<Grid Margin="0,2">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="1*"/>
+				<ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
+			<Grid Grid.Column="1" x:Name="MouseEventor">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition x:Name="ColBeg"/>
+					<ColumnDefinition x:Name="ColEnd"/>
+				</Grid.ColumnDefinitions>
+				<Rectangle>
+					<Rectangle.Fill>
+						<SolidColorBrush Color="{DynamicResource Colour}"/>
+					</Rectangle.Fill>
+				</Rectangle>
+				<Rectangle Grid.Column="1" Fill="#eee"/>
+			</Grid>
+			<Label Content="{DynamicResource Time1}" Grid.Column="0" Style="{DynamicResource SeekTime}"/>
+			<Label Content="{DynamicResource Time2}" Grid.Column="2" Style="{DynamicResource SeekTime}"/>
+		</Grid>
+	</Grid>
+</UserControl>

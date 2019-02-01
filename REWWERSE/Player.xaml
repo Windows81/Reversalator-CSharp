@@ -1,0 +1,34 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:REWWERSE"
+             xmlns:Gui="clr-namespace:NAudio.Gui;assembly=NAudio" x:Class="REWWERSE.Player"
+             mc:Ignorable="d" 
+             MaxHeight="70" MinHeight="70" MinWidth="420" d:DesignWidth="525" BorderBrush="#33808080" BorderThickness="3,3,3,2.9" Background="#FFF3F3F3">
+	<UserControl.Resources>
+		<Style BasedOn="{StaticResource {x:Type ProgressBar}}" TargetType="{x:Type ProgressBar}" x:Key="Seeking">
+			<Setter Property="Foreground" Value="#00bcf2"/>
+		</Style>
+		<Style BasedOn="{StaticResource {x:Type ProgressBar}}" TargetType="{x:Type ProgressBar}" x:Key="Playing">
+			<Setter Property="Foreground" Value="#0078d7"/>
+		</Style>
+		<Style BasedOn="{StaticResource {x:Type ProgressBar}}" TargetType="{x:Type ProgressBar}" x:Key="Paused">
+			<Setter Property="Foreground" Value="Red"/>
+		</Style>
+	</UserControl.Resources>
+	<Grid>
+		<local:TrackSeeker Margin="10,0,10,5" x:Name="Progress" Height="21" VerticalAlignment="Bottom"/>
+		<TextBlock Margin="60,7,94.333,39" TextWrapping="Wrap" x:Name="SongName" TextAlignment="Center" FontWeight="Bold" FontStyle="Italic" FontSize="14"><Run Text="TextBlock"/></TextBlock>
+		<Button x:Name="Right" VerticalAlignment="Top" Height="25" Margin="0,7,44.333,0" Content="»" Background="#FFDDDDDD" HorizontalAlignment="Right" Width="20" BorderThickness="0" FontSize="11" Click="Right_Click" FontWeight="Bold" VerticalContentAlignment="Center"/>
+		<Button x:Name="Left" VerticalAlignment="Top" Height="25" Margin="0,7,69.333,0" Content="«" Background="#FFDDDDDD" HorizontalAlignment="Right" Width="20" BorderThickness="0" FontSize="11" Click="Left_Click" FontWeight="Bold" VerticalContentAlignment="Center"/>
+		<Button x:Name="Pauser" VerticalAlignment="Top" Height="25" Margin="10,7,0,0" Content="PAUSE" Background="#FFDDDDDD" BorderThickness="0" FontStyle="Italic" FontSize="11" HorizontalAlignment="Left" Width="45" Click="Pause_Click"/>
+		<ComboBox VerticalAlignment="Top" Margin="0,7,10.333,0" Height="25" HorizontalAlignment="Right" Width="19">
+			<MenuItem Header="Export" Click="MenuItem_Click"/>
+			<Slider Width="127" ValueChanged="VolumeChanged" Maximum="100" Value="100" SmallChange="1" LargeChange="10" AutoToolTipPlacement="TopLeft"/>
+		</ComboBox>
+		<GridSplitter Height="21" Margin="0,9,34.333,0" VerticalAlignment="Top" Width="5"/>
+		<TextBlock Margin="0,10,34.333,0" TextWrapping="Wrap" Text="|" VerticalAlignment="Top" TextAlignment="Center" HorizontalAlignment="Right" Width="5" Foreground="#FFB4B4B4"/>
+	</Grid>
+</UserControl>
