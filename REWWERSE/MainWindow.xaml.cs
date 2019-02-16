@@ -1,21 +1,5 @@
-﻿using NAudio.Wave;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Windows;
-using System.Windows.Input;
-using static System.Environment;
-using static System.Threading.Thread;
-using System.Windows.Threading;
-using System.IO.Compression;
-using System.Collections;
+﻿using System.Windows;
 using static REWWERSE.StaticMethods;
-using WMPLib;
-using System.Threading.Tasks;
 
 namespace REWWERSE
 {

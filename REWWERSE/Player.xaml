@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:REWWERSE"
-             xmlns:Gui="clr-namespace:NAudio.Gui;assembly=NAudio" x:Class="REWWERSE.Player"
+			 x:Class="REWWERSE.Player"
              mc:Ignorable="d" 
              MaxHeight="70" MinHeight="70" MinWidth="420" d:DesignWidth="525" BorderBrush="#33808080" BorderThickness="3,3,3,2.9" Background="#FFF3F3F3">
 	<UserControl.Resources>

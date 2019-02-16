@@ -1,22 +1,14 @@
-﻿using NAudio.Wave;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
-using System.Windows.Input;
-using static System.Environment;
 using static System.Threading.Thread;
 using System.Windows.Threading;
-using System.IO.Compression;
-using System.Collections;
 using static REWWERSE.StaticMethods;
 using System.Windows.Controls;
 using WMPLib;
-using System.Xml;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -90,7 +82,7 @@ namespace REWWERSE
 			{
 				var info = currentPlaylist[c];
 				string artist = info.artist, song = info.songName;
-				EvaluateAndReverse(info);
+				EvalReverseSong(info);
 				if (abortThread) return;
 				completedSongs[c] = info;
 				GC.Collect();
@@ -98,17 +90,16 @@ namespace REWWERSE
 			}
 		}
 		
-		private void EvaluateAndReverse(SongInfo info)
+		private void EvalReverseSong(SongInfo info)
 		{
 			var path = info.filePath;
-			if (!path.EndsWith(".wav"))
+			if (!path.EndsWith(".mp3"))
 				return;
 			if (!reversed ^ IsReversedFile(path))
 				return;
-			ReverseStream(path, rootPath + "/.wav");
+			var nPath = info.filePath = path.Substring(0, path.Length - 5) + (reversed ? 'r' : 'f') + ".mp3";
+			ReverseStream(path, nPath);
 			File.Delete(path);
-			File.Move(rootPath + "/.wav", info.filePath =
-			path.Substring(0, path.Length - 5) + (reversed ? 'r' : 'f') + ".wav");
 		}
 
 		public void SetupProgress()
@@ -143,12 +134,19 @@ namespace REWWERSE
 		}
 
 		public void PlayPlaylistAsync(Func<Playlist> task, bool? reversed = null) => PlayPlaylistAsync(new Task<Playlist>(task), reversed);
-		public async void PlayPlaylistAsync(Task<Playlist> task, bool? reversed = null) { Stage = 1; task.Start(); PlayPlaylist(await task, reversed); }
+		public async void PlayPlaylistAsync(Task<Playlist> task, bool? reversed = null)
+		{
+			Stage = 1;
+			task.Start();
+			try { PlayPlaylist(await task, reversed); }
+			catch (PlaylistUnloadableException) { MessageBox.Show("Unable to load playlist options."); };
+		}
 
 		[Obsolete]
 		public void InvokePlaylist(bool? reversed = null, params object[] args) => InvokePlaylist("GetAlbum", reversed, args);
 		[Obsolete]
-		public void InvokePlaylist(string method, bool? reversed = null, params object[] args) => new Thread(o => {
+		public void InvokePlaylist(string method, bool? reversed = null, params object[] args) => new Thread(o =>
+		{
 			Stage = 1;
 			var pl = typeof(StaticMethods).GetRuntimeMethod(method, args.Select(
 				a => a.GetType()).ToArray()).Invoke(null, args) as Playlist;

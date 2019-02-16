@@ -1,20 +1,12 @@
-﻿using NAudio.Wave;
-using REWWERSE.Properties;
-using SpotifyAPI.Web;
-using SpotifyAPI.Web.Enums;
+﻿using System.Diagnostics;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Forms;
 using System.Xml;
 using static System.Environment;
@@ -37,6 +29,7 @@ namespace REWWERSE
 		Pooling = 1,
 		Nippyshare = 2,
 	}
+	class PlaylistUnloadableException : Exception { }
 	static class StaticMethods
 	{
 		static StaticMethods()
@@ -46,20 +39,13 @@ namespace REWWERSE
 			ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 		}
 
-		public static SpotifyWebAPI Spotify
-		{
-			get {
-				OAuthSpotifyGui.GetToken();
-				return null;
-			}
-		}
-		public static string rootPath = GetFolderPath(SpecialFolder.MyMusic) + "/SAVED";
+		public static string rootPath = GetFolderPath(SpecialFolder.MyMusic) + "\\SAVED";
 		public static WebClient cl = new WebClient();
 		public static string Time() => DateTime.UtcNow.ToString("yyyymmddThhmmss'Z'");
 		public static string GetSongName(string artist, string song) => (artist.Length > 0 ? artist + " - " : "") + song;
-		public static string GetAlbumName(string artist, string album) => rootPath + '/' + ((artist.Length > 0 ? artist + " - " : "") + album).ToUpper();
+		public static string GetAlbumName(string artist, string album) => rootPath + '\\' + ((artist.Length > 0 ? artist + " - " : "") + album).ToUpper();
 		public static string GetNameFromPath(string path) => path.Substring(path.LastIndexOf('\\') + 4, path.Length - path.LastIndexOf('\\') - 9);
-		public static bool IsReversedFile(string path) => path.EndsWith("r.wav");
+		public static bool IsReversedFile(string path) => path.EndsWith("r.mp3");
 
 		public static List<string> GetBingResultUrls(string query, int start = 1, int end = 10)
 		{
@@ -108,7 +94,7 @@ namespace REWWERSE
 			foreach (var url in GetPooledAlbumResults(artist, album, start, end))
 				if ((p = SaveAlbumFromZip(artist, album, url)) != null)
 					return p;
-			return null;
+			throw new PlaylistUnloadableException();
 		}
 		public static Playlist SaveNippyshareAlbum(string artist, string album)
 		{
@@ -124,7 +110,7 @@ namespace REWWERSE
 				Thread.Sleep(1271);
 				return SaveAlbumFromZip(artist, album, "http://" + dUrl);
 			}
-			return null;
+			throw new PlaylistUnloadableException();
 		}
 
 		private static Playlist GetSavedAlbum(string artist, string album)
@@ -133,7 +119,7 @@ namespace REWWERSE
 			var aFolderPath = GetAlbumName(artist, album);
 			if (Directory.Exists(aFolderPath))
 			{
-				foreach (var file in Directory.GetFiles(aFolderPath, "*.wav"))
+				foreach (var file in Directory.GetFiles(aFolderPath, "*.mp3"))
 					A.Add(new SongInfo()
 					{
 						filePath = file,
@@ -201,14 +187,13 @@ namespace REWWERSE
 			for (int c = 0; c < entries.Count; c++)
 			{
 				var str = entries[c].Open();
-				var mp3P = aFolderPath + "/ALBUMDL" + c + ".mp3";
-				var path = aFolderPath + string.Format("/{0:D2} {1} f.wav", c + 1, entryNames[c]);
-				var fs = new FileStream(mp3P, FileMode.Create);
+				var path = aFolderPath + string.Format("/{0:D2} {1} f.mp3", c + 1, entryNames[c]);
+				var fs = new FileStream(path, FileMode.Create);
 				str.CopyTo(fs);
 				str.Dispose();
 				fs.Dispose();
-				ConvertStream(mp3P, path);
-				File.Delete(mp3P);
+				//ConvertStream(mp3P, path);
+				//File.Delete(mp3P);
 
 				A.Add(new SongInfo()
 				{
@@ -250,21 +235,23 @@ namespace REWWERSE
 		}
 		private static Playlist GetSavedSong(string artist, string song)
 		{
-			var f = Directory.GetFiles(rootPath, GetSongName(artist, song) + "*.wav", SearchOption.AllDirectories);
+			var f = Directory.GetFiles(rootPath, GetSongName(artist, song) + "*.mp3", SearchOption.AllDirectories);
 			return f.Length > 0 ? new Playlist(new SongInfo() { artist = artist, songName = song, filePath = f[0] }) : null;
 		}
+
+		//Saves an individual song.
 		private static Playlist SaveSong(string artist, string song, string url)
 		{
 			var t = Time();
-			string mp3P = rootPath + '/' + "DOWNLOAD" + t + ".mp3";
-			string path = rootPath + '/' + artist + " - " + song + " f.wav";
+			string path = rootPath + '\\' + artist + " - " + song + " f.mp3";
 			FileStream sw = null;
 			try
 			{
-				cl.OpenRead(url).CopyTo(sw = new FileStream(mp3P, FileMode.Create));
+				cl.OpenRead(url).CopyTo(sw = new FileStream(path, FileMode.Create));
 				sw.Dispose();
-				ConvertStream(mp3P, path);
-				File.Delete(mp3P);
+				//It's gonna remain an MP3, unlike before.
+				//ConvertStream(mp3P, path);
+				//File.Delete(mp3P);
 				return new Playlist(new SongInfo()
 				{
 					songName = song,
@@ -332,35 +319,29 @@ namespace REWWERSE
 			return v;
 		}
 
+		/*
 		public static void ConvertStream(string input, string output)
 		{
 			using (var mp3 = new Mp3FileReader(input))
 			using (var wfc = WaveFormatConversionStream.CreatePcmStream(mp3))
 				WaveFileWriter.CreateWaveFile(output, wfc);
 		}
+		*/
 
-		public static void ReverseStream(string input, string output)
+		public static void ReverseStream(string i, string o)
 		{
-			int c = 0;
-			const int b = 4;
-			var reader = new WaveFileReader(input);
-			//Why is 'b' set to 4?  Since the input file gets converted into a WAV anyway, it might as well have the same wave format.
-			var m = new WaveFileWriter(output, reader.WaveFormat);
-			var i = reader.Length / b;
-			var l = new byte[i][];
-			var f = new byte[b];
-			do
+			var process = new Process
 			{
-				var a = new byte[b];
-				reader.Read(f, 0, f.Length);
-				Array.Copy(f, a, b);
-				l[--i] = a;
-			} while ((c += f.Length) < reader.Length);
-			foreach (var a in l)
-				m.Write(a, 0, b);
-			//var w = new WaveFileWriter(s, reader.WaveFormat);
-			reader.Dispose();
-			m.Dispose();
+				StartInfo = new ProcessStartInfo
+				{
+					FileName = "cmd.exe",
+					WorkingDirectory = CurrentDirectory,
+					WindowStyle = ProcessWindowStyle.Hidden,
+					Arguments = $"/C sox \"{i}\" f.wav&sox f.wav \"{o}\" reverse&del f.wav"
+				}
+			};
+			process.Start();
+			process.WaitForExit();
 		}
 
 		public static void ShowMessage(string text) => System.Windows.Forms.MessageBox.Show(text);
@@ -417,6 +398,7 @@ namespace REWWERSE
 			}
 		}
 
+		/*
 		public static List<Tuple<string,string>> RecommendSongs(string artist, string song) {
 			List<string> l(string s) => new List<string> { s };
 			var e = Spotify.SearchItems(artist, SearchType.Artist).Error;
@@ -425,5 +407,6 @@ namespace REWWERSE
 			var tList = Spotify.GetRecommendations(l(aObj.Id), null, l(sObj.Id)).Tracks;
 			return tList.Select(t => new Tuple<string, string>(t.Artists[0].Name, t.Name)).ToList();
 		}
+		*/
 	}
 }
